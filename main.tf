@@ -2,7 +2,7 @@
 provider "google" {
   credentials = "${file(var.credential.data)}"
   project     = "${lookup(var.project_name, "${terraform.workspace}")}"
-  region      = "us-west1-a"
+  region      = "asia-northeast1"
 }
 
 # Generates an archive from content, a file, or directory of files
@@ -16,7 +16,7 @@ data "archive_file" "function_zip" {
 resource "google_storage_bucket" "slack_functions_bucket" {
   name          = "${lookup(var.project_name, "${terraform.workspace}")}-scheduler-bucket"
   project       = "${lookup(var.project_name, "${terraform.workspace}")}"
-  location      = "us"
+  location      = "asia"
   force_destroy = true
 }
 
@@ -37,11 +37,11 @@ resource "google_pubsub_topic" "slack_notify" {
 resource "google_cloudfunctions_function" "slack_notification" {
   name        = "SlackNotification"
   project     = "${lookup(var.project_name, "${terraform.workspace}")}"
-  region      = "us-west1-a"
+  region      = "asia-northeast1"
   runtime     = "go111"
   entry_point = "SlackNotification"
 
-  # gcs setting
+  # exec func bucket and path
   source_archive_bucket = "${google_storage_bucket.slack_functions_bucket.name}"
   source_archive_object = "${google_storage_bucket_object.functions_zip.name}"
 
@@ -67,3 +67,4 @@ resource "google_cloud_scheduler_job" "slack-notify-scheduler" {
     data       = "${base64encode("{\"mention\":\"channel\",\"channel\":\"random\"}")}"
   }
 }
+

@@ -17,7 +17,6 @@ crash.log
 # example.tfvars
 
 # unimportant
-src/
 files/
 
 # variable key
